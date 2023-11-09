@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+}
+
+group = 'net.njsharpe'
+version = '1.0-SNAPSHOT'
+
+sourceSets {
+    java {
+        resources {
+            srcDirs "src/main/java"
+        }
+    }
+    test {
+        resources {
+            srcDirs "src/test/java"
+            includes = ["**/*.csv"]
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
