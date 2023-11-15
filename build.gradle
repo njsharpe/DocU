@@ -20,7 +20,7 @@ sourceSets {
 }
 
 jar {
-    archiveFileName.set("${rootProject.name}.jar")
+    archiveFileName.set("${rootProject.name.toLowerCase()}.jar")
 }
 
 repositories {
