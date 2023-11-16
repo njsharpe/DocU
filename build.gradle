@@ -1,26 +1,15 @@
 plugins {
     id 'java'
+    id 'idea'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 group = 'net.njsharpe'
-version = "${major}.${minor}.${patch}"
+version = '0.0.1'
 
-sourceSets {
-    java {
-        resources {
-            srcDirs "src/main/java"
-        }
-    }
-    test {
-        resources {
-            srcDirs "src/test/java"
-            includes = ["**/*.csv"]
-        }
-    }
-}
-
-jar {
-    archiveFileName.set("${rootProject.name.toLowerCase()}.jar")
+shadowJar {
+    archiveClassifier.set('')
 }
 
 repositories {
@@ -34,4 +23,15 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        shadow(MavenPublication) {
+            groupId group
+            artifactId project.name
+            version version
+            artifact shadowJar
+        }
+    }
 }
