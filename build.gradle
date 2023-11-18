@@ -1,14 +1,14 @@
 plugins {
     id 'java'
     id 'idea'
-    id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-group = 'net.njsharpe'
-version = '0.0.1'
+group = group
+version = version
 
 shadowJar {
+    archiveBaseName.set(artifactId)
     archiveClassifier.set('')
 }
 
@@ -23,15 +23,4 @@ dependencies {
 
 test {
     useJUnitPlatform()
-}
-
-publishing {
-    publications {
-        shadow(MavenPublication) {
-            groupId group
-            artifactId project.name
-            version version
-            artifact shadowJar
-        }
-    }
 }
