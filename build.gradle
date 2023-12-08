@@ -2,18 +2,32 @@ plugins {
     id 'java'
     id 'idea'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'maven-publish'
 }
 
-group = group
-version = version
+group = grp
+version = ver
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    withJavadocJar()
+    withSourcesJar()
+}
 
 shadowJar {
-    archiveBaseName.set(artifactId)
+    archiveBaseName.set(art)
     archiveClassifier.set('')
+
+    assemble {
+        dependsOn tasks.named('shadowJar')
+    }
 }
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -23,4 +37,18 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId grp
+            artifactId art
+            version ver
+
+            artifact jar
+            artifact javadocJar
+            artifact sourcesJar
+        }
+    }
 }
