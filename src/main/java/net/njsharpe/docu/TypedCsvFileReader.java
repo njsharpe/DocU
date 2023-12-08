@@ -69,6 +69,18 @@ public class TypedCsvFileReader<T> extends CsvFileReader {
                 field.setAccessible(true);
 
                 Class<?> type = field.getType();
+
+                // Parse converters first to allow primitive type overrides
+                Converter converter = field.getAnnotation(Converter.class);
+                if(converter != null) {
+                    Class<? extends TypeConverter<?>> clazz = converter.value();
+                    Method convert = clazz.getDeclaredMethod("convert", String.class);
+                    Constructor<? extends TypeConverter<?>> constructor = clazz.getDeclaredConstructor();
+                    TypeConverter<?> tc = constructor.newInstance();
+                    field.set(t, convert.invoke(tc, cell));
+                    continue;
+                }
+
                 if(type.isPrimitive()) {
                     // Custom conversion logic for char primitive, since it does not follow "parseX" convention
                     if(type == char.class) {
@@ -79,14 +91,6 @@ public class TypedCsvFileReader<T> extends CsvFileReader {
                     Method valueOf = callInfo.getSource().getDeclaredMethod(callInfo.getName(), callInfo.getParameters());
                     field.set(t, valueOf.invoke(null, callInfo.getParameters()[0].cast(cell.isBlank() ? Defaults.valueOf(type).toString() : cell)));
                     continue;
-                }
-
-                for(MethodCallInfo callInfo : STRING_TO_COMPLEX_LIST) {
-                    if(callInfo.getSource() == type) {
-                        Method valueOf = type.getDeclaredMethod(callInfo.getName(), callInfo.getParameters());
-                        field.set(t, valueOf.invoke(null, callInfo.getParameters()[0].cast(cell)));
-                        break;
-                    }
                 }
 
                 // Custom conversion logic for char primitive, since it does not follow "parseX" convention
@@ -100,17 +104,17 @@ public class TypedCsvFileReader<T> extends CsvFileReader {
                     continue;
                 }
 
-                Converter converter = field.getAnnotation(Converter.class);
-                if(converter == null) {
-                    throw new IllegalStateException("Cannot convert from 'String' to '%s' without a converter!"
-                            .formatted(field.getType().getSimpleName()));
+                for(MethodCallInfo callInfo : STRING_TO_COMPLEX_LIST) {
+                    if(callInfo.getSource() == type) {
+                        Method valueOf = type.getDeclaredMethod(callInfo.getName(), callInfo.getParameters());
+                        field.set(t, valueOf.invoke(null, callInfo.getParameters()[0].cast(cell)));
+                        break;
+                    }
                 }
 
-                Class<? extends TypeConverter<?>> clazz = converter.value();
-                Method convert = clazz.getDeclaredMethod("convert", String.class);
-                Constructor<? extends TypeConverter<?>> constructor = clazz.getDeclaredConstructor();
-                TypeConverter<?> tc = constructor.newInstance();
-                field.set(t, convert.invoke(tc, cell));
+                // Throw when could not convert for any primitive type
+                throw new IllegalStateException("Cannot convert from 'String' to '%s' without a converter!"
+                        .formatted(field.getType().getSimpleName()));
             }
         } catch(InaccessibleObjectException ex) {
             throw new RuntimeException("Could not find or access field via reflection!", ex);

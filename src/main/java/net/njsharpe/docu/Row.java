@@ -21,7 +21,7 @@ public class Row implements Iterator<String> {
 
     @Override
     public boolean hasNext() {
-        return this.cursor + 1 < this.cells.length;
+        return this.cursor + 1 <= this.cells.length;
     }
 
     @Override
