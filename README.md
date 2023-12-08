@@ -1,1 +1,1 @@
-[![](https://jitci.com/gh/njsharpe/DocU/svg)](https://jitci.com/gh/njsharpe/DocU)
+[![](https://jitpack.io/v/njsharpe/DocU.svg)](https://jitpack.io/#njsharpe/DocU)
