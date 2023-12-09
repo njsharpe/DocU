@@ -5,11 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
-public class CsvFileReaderTests extends CsvFileData {
+public class CsvFileReaderTests extends CsvReaderData {
 
     private final String[][] people = new String[][] {
             new String[] { "1",     "Smith",        "John",     "",     "26",   ""  },
@@ -20,12 +18,11 @@ public class CsvFileReaderTests extends CsvFileData {
 
     @Test
     public void check() {
-        try(InputStream stream = new ByteArrayInputStream(this.data.getBytes(StandardCharsets.UTF_8));
-            InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(stream));
-            CsvFileReader csv = new CsvFileReader(reader, false)) {
+        try(ByteArrayInputStream stream = new ByteArrayInputStream(this.data.getBytes(StandardCharsets.UTF_8));
+            CsvFileReader csv = new CsvFileReader(stream, false)) {
             Row row;
             int index = 0;
-            while((row = csv.read()) != null) {
+            while((row = csv.readRow()) != null) {
                 while(row.hasNext()) {
                     String cell = row.next();
                     Assertions.assertEquals(this.people[index][row.cell()], cell);

@@ -7,7 +7,7 @@ public class Row implements Iterator<String> {
     private final String[] cells;
     private int cursor;
 
-    public Row(String[] cells) {
+    private Row(String[] cells) {
         this.cells = cells;
     }
 
@@ -27,6 +27,10 @@ public class Row implements Iterator<String> {
     @Override
     public String next() {
         return this.cells[this.cursor++];
+    }
+
+    public static Row wrap(String... cells) {
+        return new Row(cells);
     }
 
 }

@@ -1,6 +1,6 @@
 package net.njsharpe.docu;
 
-public class CsvFileData {
+public class CsvReaderData {
 
     protected final String data =
             """

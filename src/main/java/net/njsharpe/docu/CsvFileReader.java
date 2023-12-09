@@ -1,66 +1,75 @@
 package net.njsharpe.docu;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.Reader;
+import net.njsharpe.docu.util.Make;
+
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CsvFileReader implements Closeable {
+public class CsvFileReader extends InputStreamReader {
 
-    private final Reader reader;
     private final boolean hasHeaders;
     private final boolean skipHeaders;
 
-    private int cursor;
+    private final byte[] lineSeparatorBytes;
 
-    public CsvFileReader(Reader reader) {
-        this(reader, false);
+    private int index;
+
+    public CsvFileReader(InputStream stream) {
+        this(stream, false);
     }
 
-    public CsvFileReader(Reader reader, boolean hasHeaders) {
-        this(reader, hasHeaders, true);
+    public CsvFileReader(InputStream stream, boolean hasHeaders) {
+        this(stream, hasHeaders, true);
     }
 
-    public CsvFileReader(Reader reader, boolean hasHeaders, boolean skipHeaders) {
-        this.reader = reader;
+    public CsvFileReader(InputStream stream, boolean hasHeaders, boolean skipHeaders) {
+        super(stream);
         this.hasHeaders = hasHeaders;
         this.skipHeaders = skipHeaders;
-        this.cursor = 0;
+
+        String ls = System.lineSeparator();
+        // Windows: [0: 0x0D, 1: 0x0A]
+        // Unix: [0: 0x0A]
+        this.lineSeparatorBytes = Make.tryGetOrDefault(() ->
+                ls.getBytes(this.getEncoding()), ls.getBytes());
+
+        this.index = 0;
     }
 
-    public Row read() throws IOException {
-        Row row = this.readRow();
-        if(this.cursor == 1 && this.hasHeaders && this.skipHeaders) return this.read();
+    public Row readRow() throws IOException {
+        Row row = this.readRowBytes();
+        if(this.index == 1 && this.hasHeaders && this.skipHeaders) return this.readRow();
         return row;
     }
 
-    private Row readRow() throws IOException {
+    private Row readRowBytes() throws IOException {
         List<Character> chars = new ArrayList<>();
 
         int c;
-        if((c = this.reader.read()) == -1) {
+        // Check for EOF
+        if((c = this.read()) == -1) {
             return null;
         }
 
-        // Read all characters until first \n (0x0A)
-        while(c != 0x0A) {
+        // Read all characters until first char in line separator
+        while(c != this.lineSeparatorBytes[0]) {
             chars.add((char) c);
-            c = this.reader.read();
+            c = this.read();
         }
 
-        this.cursor++;
-
-        // Remove final \r (0x0D) byte for windows-based files
-        if(chars.get(chars.size() - 1) == 0x0D) {
-            chars.remove(chars.size() - 1);
+        // Remove potential extra char in line separator for Windows devices
+        if(this.lineSeparatorBytes.length == 2) {
+            this.skip(1);
         }
+
+        this.index++;
 
         String content = chars.stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining());
 
-        return new Row(this.split(content, ','));
+        return Row.wrap(this.split(content, ','));
     }
 
     private String[] split(String string, char delimiter) {
@@ -98,11 +107,6 @@ public class CsvFileReader implements Closeable {
         }
 
         return parts.toArray(new String[0]);
-    }
-
-    @Override
-    public void close() throws IOException {
-        this.reader.close();
     }
 
 }

@@ -6,8 +6,7 @@ import net.njsharpe.docu.convert.TypeConverter;
 import net.njsharpe.docu.reflect.MethodCallInfo;
 import net.njsharpe.docu.reflect.Reflection;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InaccessibleObjectException;
@@ -42,22 +41,19 @@ public class TypedCsvFileReader<T> extends CsvFileReader {
         STRING_TO_PRIMITIVE_MAP.put(boolean.class, MethodCallInfo.of(Boolean.class, "parseBoolean", String.class));
     }
 
-    public TypedCsvFileReader(Class<T> type, Reader reader) {
-        this(type, reader, false);
+    public TypedCsvFileReader(Class<T> type, InputStream stream) {
+        this(type, stream, false);
     }
 
-    public TypedCsvFileReader(Class<T> type, Reader reader, boolean hasHeaders) {
-        this(type, reader, hasHeaders, true);
-    }
-
-    public TypedCsvFileReader(Class<T> type, Reader reader, boolean hasHeaders, boolean skipHeaders) {
-        super(reader, hasHeaders, skipHeaders);
+    public TypedCsvFileReader(Class<T> type, InputStream stream, boolean hasHeaders) {
+        // Force always skip headers for typed reads
+        super(stream, hasHeaders, true);
         this.type = type;
         this.columnMap = this.buildColumnMap();
     }
 
-    public T readAs() throws IOException {
-        Row row = this.read();
+    public T readRowAs() throws IOException {
+        Row row = this.readRow();
         if(row == null || row.isEmpty()) return null;
         T t = Reflection.createInstanceFromNoArgsConstructor(this.type);
 
@@ -121,7 +117,7 @@ public class TypedCsvFileReader<T> extends CsvFileReader {
         } catch(NoSuchMethodException ex) {
             throw new RuntimeException("Could not find or access method via reflection!", ex);
         } catch(Exception ex) {
-            throw new RuntimeException("Unknown error!", ex);
+            throw new RuntimeException("Unknown error, see inner error details!", ex);
         }
 
         return t;
