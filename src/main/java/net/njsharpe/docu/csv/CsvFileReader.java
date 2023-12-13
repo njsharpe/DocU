@@ -1,4 +1,4 @@
-package net.njsharpe.docu;
+package net.njsharpe.docu.csv;
 
 import net.njsharpe.docu.util.Make;
 
@@ -47,19 +47,21 @@ public class CsvFileReader extends InputStreamReader {
         List<Character> chars = new ArrayList<>();
 
         int c;
-        // Check for EOF
-        if((c = this.read()) == -1) {
+        // Initial check for EOF
+        if(this.isEOF(c = this.read())) {
             return null;
         }
 
         // Read all characters until first char in line separator
-        while(c != this.lineSeparatorBytes[0]) {
+        // Null byte check required for null terminated input
+        while(c != this.lineSeparatorBytes[0] && !this.isEOF(c)) {
             chars.add((char) c);
             c = this.read();
         }
 
         // Remove potential extra char in line separator for Windows devices
-        if(this.lineSeparatorBytes.length == 2) {
+        // Additional check if null terminated to not overflow with skip
+        if(this.lineSeparatorBytes.length == 2 && !this.isEOF(c)) {
             this.skip(1);
         }
 
@@ -70,6 +72,10 @@ public class CsvFileReader extends InputStreamReader {
                 .collect(Collectors.joining());
 
         return Row.wrap(this.split(content, ','));
+    }
+
+    private boolean isEOF(int c) {
+        return c == -1 || c == 0;
     }
 
     private String[] split(String string, char delimiter) {

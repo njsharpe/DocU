@@ -1,6 +1,8 @@
 package net.njsharpe.docu;
 
 import net.njsharpe.docu.annotation.Column;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class Person {
 
@@ -14,19 +16,21 @@ public class Person {
     public String firstName;
 
     @Column(3)
-    public char middleInitial;
+    @Nullable
+    public Character middleInitial;
 
     @Column(4)
     public int age;
 
     @Column(5)
-    public int householdId;
+    @Nullable
+    public Integer householdId;
 
     private Person() {
-        // Required for anonymous construction
+        // Required for use internally
     }
 
-    public Person(int id, String lastName, String firstName, int age) {
+    public Person(int id, @NotNull String lastName, @NotNull String firstName, int age) {
         this.id = id;
         this.lastName = lastName;
         this.firstName = firstName;

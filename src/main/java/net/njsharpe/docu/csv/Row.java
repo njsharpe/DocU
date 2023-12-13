@@ -1,4 +1,4 @@
-package net.njsharpe.docu;
+package net.njsharpe.docu.csv;
 
 import java.util.Iterator;
 

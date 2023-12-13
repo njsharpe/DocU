@@ -1,4 +1,4 @@
-package net.njsharpe.docu;
+package net.njsharpe.docu.csv;
 
 import net.njsharpe.docu.util.Make;
 
@@ -31,12 +31,14 @@ public class CsvFileWriter extends OutputStreamWriter {
         while(row.hasNext()) {
             String cell = row.next();
 
-            // Cell contains a comma, must be quoted
-            if(cell.chars().anyMatch(c -> c == ',')) {
-                String quoted = "\"%s\"".formatted(cell);
-                this.write(quoted);
-            } else {
-                this.write(cell);
+            if(cell != null) {
+                // Cell contains a comma, must be quoted
+                if(cell.chars().anyMatch(c -> c == ',')) {
+                    String quoted = "\"%s\"".formatted(cell);
+                    this.write(quoted);
+                } else {
+                    this.write(cell);
+                }
             }
 
             if(row.hasNext()) {

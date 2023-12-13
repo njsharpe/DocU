@@ -1,9 +1,14 @@
 package net.njsharpe.docu;
 
+import net.njsharpe.docu.csv.CsvFileReader;
+import net.njsharpe.docu.csv.Row;
+import net.njsharpe.docu.csv.TypedCsvFileReader;
+import net.njsharpe.docu.csv.TypedCsvFileWriter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -22,16 +27,30 @@ public class TypedCsvFileReaderTests extends CsvReaderData {
     };
 
     @Test
-    public void check() {
+    public void fromMemoryTest() {
         try(ByteArrayInputStream stream = new ByteArrayInputStream(this.data.getBytes(StandardCharsets.UTF_8));
             TypedCsvFileReader<Person> csv = new TypedCsvFileReader<>(Person.class, stream, false)) {
-            Person person;
-            int index = 0;
-            while((person = csv.readRowAs()) != null) {
-                Assertions.assertEquals(this.people[index++], person);
-            }
+            this.assertContents(csv);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    @Test
+    public void fromFileTest() {
+        try(InputStream stream = this.getClass().getClassLoader().getResourceAsStream("data.csv");
+            TypedCsvFileReader<Person> csv = new TypedCsvFileReader<>(Person.class, stream, false)) {
+            this.assertContents(csv);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private <T> void assertContents(TypedCsvFileReader<T> csv) throws IOException {
+        T t;
+        int index = 0;
+        while((t = csv.readRowAs()) != null) {
+            Assertions.assertEquals(this.people[index++], t);
         }
     }
 
