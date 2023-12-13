@@ -1,8 +1,4 @@
 package net.njsharpe.docu.convert;
 
-@FunctionalInterface
-public interface TypeConverter<T> {
-
-    T convert(String string);
-
+public interface TypeConverter<T> extends TypeSerializer<T>, TypeDeserializer<T> {
 }

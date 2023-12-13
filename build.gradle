@@ -17,7 +17,6 @@ java {
 }
 
 shadowJar {
-    archiveBaseName.set(art)
     archiveClassifier.set('')
 
     assemble {
@@ -31,8 +30,12 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.projectlombok:lombok:1.18.28'
+    compileOnly 'org.jetbrains:annotations-java5:24.0.1'
+
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testCompileOnly 'org.jetbrains:annotations:24.0.1'
 }
 
 test {
@@ -43,7 +46,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId grp
-            artifactId art
+            artifactId project.name
             version ver
 
             artifact jar
