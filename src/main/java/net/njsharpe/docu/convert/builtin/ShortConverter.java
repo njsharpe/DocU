@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.njsharpe.docu.convert.TypeConverter;
+import net.njsharpe.docu.util.Make;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ShortConverter implements TypeConverter<Short> {
@@ -13,12 +14,12 @@ public final class ShortConverter implements TypeConverter<Short> {
 
     @Override
     public Short deserialize(String string) {
-        return Short.parseShort(string);
+        return Make.tryGetOrDefault(() -> Short.parseShort(string), null);
     }
 
     @Override
     public String serialize(Short s) {
-        return s == null ? null : s.toString();
+        return Make.toSafeString(s);
     }
 
 }

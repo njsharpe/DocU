@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.njsharpe.docu.convert.TypeConverter;
+import net.njsharpe.docu.util.Make;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BooleanConverter implements TypeConverter<Boolean> {
@@ -13,12 +14,12 @@ public final class BooleanConverter implements TypeConverter<Boolean> {
 
     @Override
     public Boolean deserialize(String string) {
-        return Boolean.parseBoolean(string);
+        return Make.tryGetOrDefault(() -> Boolean.parseBoolean(string), null);
     }
 
     @Override
     public String serialize(Boolean b) {
-        return b == null ? null : b.toString();
+        return Make.toSafeString(b);
     }
 
 }

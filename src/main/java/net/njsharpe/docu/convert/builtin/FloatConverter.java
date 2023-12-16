@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.njsharpe.docu.convert.TypeConverter;
+import net.njsharpe.docu.util.Make;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FloatConverter implements TypeConverter<Float> {
@@ -13,12 +14,12 @@ public final class FloatConverter implements TypeConverter<Float> {
 
     @Override
     public Float deserialize(String string) {
-        return Float.parseFloat(string);
+        return Make.tryGetOrDefault(() -> Float.parseFloat(string), null);
     }
 
     @Override
     public String serialize(Float f) {
-        return f == null ? null : f.toString();
+        return Make.toSafeString(f);
     }
 
 }

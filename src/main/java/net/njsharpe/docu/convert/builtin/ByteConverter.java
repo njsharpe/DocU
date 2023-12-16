@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.njsharpe.docu.convert.TypeConverter;
+import net.njsharpe.docu.util.Make;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ByteConverter implements TypeConverter<Byte> {
@@ -13,12 +14,12 @@ public final class ByteConverter implements TypeConverter<Byte> {
 
     @Override
     public Byte deserialize(String string) {
-        return Byte.parseByte(string);
+        return Make.tryGetOrDefault(() -> Byte.parseByte(string), null);
     }
 
     @Override
     public String serialize(Byte b) {
-        return b == null ? null : b.toString();
+        return Make.toSafeString(b);
     }
 
 }
