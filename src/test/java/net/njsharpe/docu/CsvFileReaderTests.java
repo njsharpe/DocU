@@ -2,16 +2,18 @@ package net.njsharpe.docu;
 
 import net.njsharpe.docu.csv.CsvFileReader;
 import net.njsharpe.docu.csv.Row;
+import net.njsharpe.docu.util.InputOutput;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-public class CsvFileReaderTests extends CsvReaderData {
+public class CsvFileReaderTests {
 
-    private final String[][] people = new String[][] {
+    private final String[][] read = new String[][] {
             new String[] { "1",     "Smith",        "John",     "",     "26",   ""  },
             new String[] { "2",     "Jobs",         "Steve",    "",     "55",   ""  },
             new String[] { "3",     "Robertson",    "David",    "G",    "43",   "1" },
@@ -20,7 +22,7 @@ public class CsvFileReaderTests extends CsvReaderData {
 
     @Test
     public void fromMemoryTest() {
-        try(ByteArrayInputStream stream = new ByteArrayInputStream(this.data.getBytes(StandardCharsets.UTF_8));
+        try(ByteArrayInputStream stream = new ByteArrayInputStream(InputOutput.EXAMPLE_FILE_NO_APPEND_BYTES);
             CsvFileReader csv = new CsvFileReader(stream, false)) {
             this.assertContents(csv);
         } catch (Exception ex) {
@@ -30,8 +32,9 @@ public class CsvFileReaderTests extends CsvReaderData {
 
     @Test
     @DisabledIfEnvironmentVariable(named = "CI", matches = "(?i)true")
-    public void fromFileTest() {
-        try(InputStream stream = this.getClass().getClassLoader().getResourceAsStream("data.csv");
+    public void fromFileTest() throws IOException {
+        Path path = InputOutput.createNewExampleFileAndPopulateNoAppend();
+        try(InputStream stream = Files.newInputStream(path);
             CsvFileReader csv = new CsvFileReader(stream, false)) {
             this.assertContents(csv);
         } catch (Exception ex) {
@@ -45,7 +48,7 @@ public class CsvFileReaderTests extends CsvReaderData {
         while((row = csv.readRow()) != null) {
             while(row.hasNext()) {
                 String cell = row.next();
-                Assertions.assertEquals(this.people[index][row.cell()], cell);
+                Assertions.assertEquals(this.read[index][row.cell()], cell);
             }
             index++;
         }

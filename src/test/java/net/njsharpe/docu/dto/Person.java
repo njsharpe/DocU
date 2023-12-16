@@ -1,4 +1,4 @@
-package net.njsharpe.docu;
+package net.njsharpe.docu.dto;
 
 import net.njsharpe.docu.annotation.Column;
 import org.jetbrains.annotations.NotNull;
