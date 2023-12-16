@@ -3,6 +3,7 @@ package net.njsharpe.docu;
 import net.njsharpe.docu.csv.TypedCsvFileWriter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -39,13 +40,8 @@ public class TypedCsvFileWriterTests extends CsvWriterData {
     }
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "(?i)true")
     public void toFileTest() throws IOException {
-        boolean isCi = Boolean.parseBoolean(System.getenv("CI"));
-        // Skip running this test if the environment is being run in GitHub Actions
-        // We cannot post a file within the running environment, for some reason?
-        if(isCi) {
-            return;
-        }
         File file = Files.createTempFile("typed", ".csv").toFile();
         try(FileOutputStream stream = new FileOutputStream(file);
             TypedCsvFileWriter<Person> csv = new TypedCsvFileWriter<>(Person.class, stream)) {

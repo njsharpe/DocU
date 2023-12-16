@@ -4,6 +4,7 @@ import net.njsharpe.docu.csv.CsvFileReader;
 import net.njsharpe.docu.csv.Row;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -28,13 +29,8 @@ public class CsvFileReaderTests extends CsvReaderData {
     }
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "(?i)true")
     public void fromFileTest() {
-        boolean isCi = Boolean.parseBoolean(System.getenv("CI"));
-        // Skip running this test if the environment is being run in GitHub Actions
-        // We cannot post a file within the running environment, for some reason?
-        if(isCi) {
-            return;
-        }
         try(InputStream stream = this.getClass().getClassLoader().getResourceAsStream("data.csv");
             CsvFileReader csv = new CsvFileReader(stream, false)) {
             this.assertContents(csv);
