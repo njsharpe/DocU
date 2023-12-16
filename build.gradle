@@ -18,7 +18,8 @@ java {
 
 shadowJar {
     archiveClassifier.set('')
-
+    minimize()
+    
     assemble {
         dependsOn tasks.named('shadowJar')
     }
@@ -48,10 +49,8 @@ publishing {
             groupId grp
             artifactId project.name
             version ver
-
-            artifact jar
-            artifact javadocJar
-            artifact sourcesJar
+            
+            from components.java
         }
     }
 }
