@@ -12,11 +12,9 @@ public class CsvWriterData {
     };
 
     protected final String expected =
-            """
-            1,Smith,John,,26,\r
-            2,Jobs,Steve,,55,\r
-            3,Robertson,David,G,43,1\r
-            4,Robertson,Joshua,,19,1\r
-            """;
+            "1,Smith,John,,26," + System.lineSeparator() +
+            "2,Jobs,Steve,,55," + System.lineSeparator() +
+            "3,Robertson,David,G,43,1" + System.lineSeparator() +
+            "4,Robertson,Joshua,,19,1" + System.lineSeparator();
 
 }
