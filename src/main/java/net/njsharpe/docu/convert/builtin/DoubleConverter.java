@@ -5,7 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.njsharpe.docu.convert.TypeConverter;
 import net.njsharpe.docu.util.Make;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+/**
+ * Default {@link TypeConverter} used by this library to convert to and from
+ * {@link Double} types and {@link String} types.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DoubleConverter implements TypeConverter<Double> {
 
@@ -13,12 +19,14 @@ public final class DoubleConverter implements TypeConverter<Double> {
     private static final DoubleConverter instance = new DoubleConverter();
 
     @Override
-    public Double deserialize(String string) {
+    @Nullable
+    public Double deserialize(@NotNull String string) {
         return Make.tryGetOrDefault(() -> Double.parseDouble(string), null);
     }
 
     @Override
-    public String serialize(Double d) {
+    @NotNull
+    public String serialize(@Nullable Double d) {
         return Make.toSafeString(d);
     }
 

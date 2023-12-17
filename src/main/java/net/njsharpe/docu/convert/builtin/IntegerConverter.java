@@ -5,7 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.njsharpe.docu.convert.TypeConverter;
 import net.njsharpe.docu.util.Make;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+/**
+ * Default {@link TypeConverter} used by this library to convert to and from
+ * {@link Integer} types and {@link String} types.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class IntegerConverter implements TypeConverter<Integer> {
 
@@ -13,12 +19,14 @@ public final class IntegerConverter implements TypeConverter<Integer> {
     private static final IntegerConverter instance = new IntegerConverter();
 
     @Override
-    public Integer deserialize(String string) {
+    @Nullable
+    public Integer deserialize(@NotNull String string) {
         return Make.tryGetOrDefault(() -> Integer.parseInt(string), null);
     }
 
     @Override
-    public String serialize(Integer i) {
+    @NotNull
+    public String serialize(@Nullable Integer i) {
         return Make.toSafeString(i);
     }
 

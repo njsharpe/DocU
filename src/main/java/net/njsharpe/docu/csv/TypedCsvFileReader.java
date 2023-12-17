@@ -6,27 +6,60 @@ import net.njsharpe.docu.convert.TypeConverter;
 import net.njsharpe.docu.convert.TypeDeserializer;
 import net.njsharpe.docu.reflect.Reflection;
 import net.njsharpe.docu.convert.Convert;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.Map;
 
-public class TypedCsvFileReader<T> extends CsvFileReader implements CsvColumnMapper {
+/**
+ * An extension of a {@link CsvFileReader} that allows for the reading of a CSV
+ * file where each row is mapped to type {@code T}.
+ *
+ * @param <T> any non-generic object type
+ */
+public class TypedCsvFileReader<T> extends CsvFileReader {
 
     private final Class<T> type;
     private final Map<Integer, Field> columnMap;
 
-    public TypedCsvFileReader(Class<T> type, InputStream stream) {
+    /**
+     * Creates a new instance of a {@link TypedCsvFileReader}. This constructor
+     * assumes that the input data does not have any headers at the top of the
+     * file.
+     *
+     * @param type the class of type {@code T} to convert to
+     * @param stream an {@link InputStream} to wrap
+     */
+    public TypedCsvFileReader(@NotNull Class<T> type, @NotNull InputStream stream) {
         this(type, stream, false);
     }
 
-    public TypedCsvFileReader(Class<T> type, InputStream stream, boolean hasHeaders) {
+    /**
+     * Creates a new instance of a {@link TypedCsvFileReader}. This constructor
+     * assumes that the implementing code is expected to skip the header row at
+     * the top of the file.
+     *
+     * @param type the class of type {@code T} to convert to
+     * @param stream an {@link InputStream} to wrap
+     * @param hasHeaders {@code true} if the input file has a header row
+     */
+    public TypedCsvFileReader(@NotNull Class<T> type, @NotNull InputStream stream, boolean hasHeaders) {
         // Force always skip headers for typed reads
         super(stream, hasHeaders, true);
         this.type = type;
-        this.columnMap = this.buildColumnMapForType(type);
+        this.columnMap = ColumnMapper.buildColumnMapForType(type);
     }
 
+    /**
+     * Read the next row of the {@link InputStream} and convert to type
+     * {@code T}.
+     *
+     * @return an instance of {@code T} that mimics the data in the row
+     * @throws IOException if an I/O error occurs
+     */
+    @Nullable
     public T readRowAs() throws IOException {
         Row row = this.readRow();
         if(row == null || row.isEmpty()) return null;
@@ -87,7 +120,8 @@ public class TypedCsvFileReader<T> extends CsvFileReader implements CsvColumnMap
         return t;
     }
 
-    private Class<? extends TypeDeserializer<?>> getConverterOrDeserializer(Field field) {
+    @Nullable
+    private Class<? extends TypeDeserializer<?>> getConverterOrDeserializer(@NotNull Field field) {
         if(field.isAnnotationPresent(Converter.class)) {
             return field.getAnnotation(Converter.class).value();
         }
@@ -97,7 +131,7 @@ public class TypedCsvFileReader<T> extends CsvFileReader implements CsvColumnMap
         return null;
     }
 
-    private void deserialize(T t, Field field, String value, Class<? extends TypeDeserializer<?>> clazz)
+    private void deserialize(@NotNull T t, @NotNull Field field, @NotNull String value, @NotNull Class<? extends TypeDeserializer<?>> clazz)
             throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Method convert = clazz.getDeclaredMethod("deserialize", String.class);
         Constructor<? extends TypeDeserializer<?>> constructor = clazz.getDeclaredConstructor();

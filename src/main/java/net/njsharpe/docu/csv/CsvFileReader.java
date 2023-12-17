@@ -1,11 +1,18 @@
 package net.njsharpe.docu.csv;
 
 import net.njsharpe.docu.util.Make;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * An {@link InputStreamReader} wrapper designed specifically for use in
+ * reading CSV files. Data read from CSV files are outputted as {@link Row}
+ * objects to be iterated through by any implementing code.
+ */
 public class CsvFileReader extends InputStreamReader {
 
     private final boolean hasHeaders;
@@ -15,15 +22,37 @@ public class CsvFileReader extends InputStreamReader {
 
     private int index;
 
-    public CsvFileReader(InputStream stream) {
+    /**
+     * Creates a new instance of a {@link CsvFileReader}. This constructor
+     * assumes that the input data does not have any headers at the top of the
+     * file.
+     *
+     * @param stream an {@link InputStream} to wrap
+     */
+    public CsvFileReader(@NotNull InputStream stream) {
         this(stream, false);
     }
 
-    public CsvFileReader(InputStream stream, boolean hasHeaders) {
+    /**
+     * Creates a new instance of a {@link CsvFileReader}. This constructor
+     * assumes that the implementing code is expected to skip the header row at
+     * the top of the file.
+     *
+     * @param stream an {@link InputStream} to wrap
+     * @param hasHeaders {@code true} if the input file has a header row
+     */
+    public CsvFileReader(@NotNull InputStream stream, boolean hasHeaders) {
         this(stream, hasHeaders, true);
     }
 
-    public CsvFileReader(InputStream stream, boolean hasHeaders, boolean skipHeaders) {
+    /**
+     * Creates a new instance of a {@link CsvFileReader}.
+     *
+     * @param stream an {@link InputStream} to wrap
+     * @param hasHeaders {@code true} if the input file has a header row
+     * @param skipHeaders {@code true} if the reader should skip the header row
+     */
+    public CsvFileReader(@NotNull InputStream stream, boolean hasHeaders, boolean skipHeaders) {
         super(stream);
         this.hasHeaders = hasHeaders;
         this.skipHeaders = skipHeaders;
@@ -37,12 +66,20 @@ public class CsvFileReader extends InputStreamReader {
         this.index = 0;
     }
 
+    /**
+     * Read the next row of the {@link InputStream}.
+     *
+     * @return a {@link Row} object defining the structure of this row
+     * @throws IOException if an I/O error occurs
+     */
+    @Nullable
     public Row readRow() throws IOException {
         Row row = this.readRowBytes();
         if(this.index == 1 && this.hasHeaders && this.skipHeaders) return this.readRow();
         return row;
     }
 
+    @Nullable
     private Row readRowBytes() throws IOException {
         List<Character> chars = new ArrayList<>();
 
@@ -78,7 +115,8 @@ public class CsvFileReader extends InputStreamReader {
         return c == -1 || c == 0;
     }
 
-    private String[] split(String string, char delimiter) {
+    @NotNull
+    private String[] split(@Nullable String string, char delimiter) {
         List<String> parts = new ArrayList<>();
         List<Character> collector = new ArrayList<>();
 

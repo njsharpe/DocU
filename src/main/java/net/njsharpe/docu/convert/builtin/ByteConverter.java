@@ -5,7 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.njsharpe.docu.convert.TypeConverter;
 import net.njsharpe.docu.util.Make;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+/**
+ * Default {@link TypeConverter} used by this library to convert to and from
+ * {@link Byte} types and {@link String} types.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ByteConverter implements TypeConverter<Byte> {
 
@@ -13,12 +19,14 @@ public final class ByteConverter implements TypeConverter<Byte> {
     private static final ByteConverter instance = new ByteConverter();
 
     @Override
-    public Byte deserialize(String string) {
+    @Nullable
+    public Byte deserialize(@NotNull String string) {
         return Make.tryGetOrDefault(() -> Byte.parseByte(string), null);
     }
 
     @Override
-    public String serialize(Byte b) {
+    @NotNull
+    public String serialize(@Nullable Byte b) {
         return Make.toSafeString(b);
     }
 

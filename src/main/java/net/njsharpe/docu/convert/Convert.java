@@ -1,12 +1,28 @@
 package net.njsharpe.docu.convert;
 
+import lombok.experimental.UtilityClass;
 import net.njsharpe.docu.convert.builtin.*;
 
 import java.util.*;
 
-public class Convert {
+/**
+ * FOR INTERNAL USE ONLY. NON-DOCUMENTED UTILITY CLASS
+ */
+@UtilityClass
+public final class Convert {
 
+    /**
+     * FOR INTERNAL USE ONLY. <br />
+     * {@link Map} of {@link TypeConverter} to use to convert from a
+     * {@link String} to its complex object type.
+     */
     public static final Map<Class<?>, Class<? extends TypeConverter<?>>> STRING_TO_COMPLEX_MAP = new HashMap<>();
+
+    /**
+     * FOR INTERNAL USE ONLY. <br />
+     * {@link Map} of {@link TypeConverter} to use to convert from a
+     * {@link String} to its primitive object type.
+     */
     public static final Map<Class<?>, Class<? extends TypeConverter<?>>> STRING_TO_PRIMITIVE_MAP = new HashMap<>();
 
     static {

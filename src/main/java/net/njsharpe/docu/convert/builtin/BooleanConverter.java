@@ -5,7 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.njsharpe.docu.convert.TypeConverter;
 import net.njsharpe.docu.util.Make;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+/**
+ * Default {@link TypeConverter} used by this library to convert to and from
+ * {@link Boolean} types and {@link String} types.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BooleanConverter implements TypeConverter<Boolean> {
 
@@ -13,12 +19,14 @@ public final class BooleanConverter implements TypeConverter<Boolean> {
     private static final BooleanConverter instance = new BooleanConverter();
 
     @Override
-    public Boolean deserialize(String string) {
+    @Nullable
+    public Boolean deserialize(@NotNull String string) {
         return Make.tryGetOrDefault(() -> Boolean.parseBoolean(string), null);
     }
 
     @Override
-    public String serialize(Boolean b) {
+    @NotNull
+    public String serialize(@Nullable Boolean b) {
         return Make.toSafeString(b);
     }
 
